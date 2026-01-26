@@ -1,13 +1,11 @@
 import { useForm } from '@tanstack/react-form';
-import { zodValidator } from '@tanstack/zod-form-adapter';
-import { Stack, router } from 'expo-router';
-import { ScrollView, View, Alert } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { router, Stack } from 'expo-router';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { z } from 'zod';
-import { Text, Input, Button } from '@/components/ui';
-import { getFieldError } from '@/components/ui/form-utils';
-import { useUserProfile } from '@/api/users/use-user-profile';
 import { useUpdateProfile } from '@/api/users/use-update-profile';
+import { useUserProfile } from '@/api/users/use-user-profile';
+import { Button, Input, Text } from '@/components/ui';
+import { getFieldError } from '@/components/ui/form-utils';
 
 const updateProfileSchema = z.object({
   full_name: z
@@ -68,13 +66,13 @@ export default function EditProfileScreen() {
         }}
       />
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-900">
           <View className="p-4">
             {/* Full Name */}
             <form.Field
               name="full_name"
-              children={(field) => (
+              children={field => (
                 <View className="mb-4">
                   <Text className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                     Full Name *
@@ -93,7 +91,7 @@ export default function EditProfileScreen() {
             {/* Bio */}
             <form.Field
               name="bio"
-              children={(field) => (
+              children={field => (
                 <View className="mb-4">
                   <Text className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                     Bio (optional)
@@ -120,7 +118,7 @@ export default function EditProfileScreen() {
             <View className="mb-4 flex-row gap-2">
               <form.Field
                 name="current_city"
-                children={(field) => (
+                children={field => (
                   <View className="flex-1">
                     <Text className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                       City *
@@ -138,7 +136,7 @@ export default function EditProfileScreen() {
 
               <form.Field
                 name="current_country"
-                children={(field) => (
+                children={field => (
                   <View className="flex-1">
                     <Text className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
                       Country *
@@ -157,7 +155,7 @@ export default function EditProfileScreen() {
 
             {/* Submit Button */}
             <form.Subscribe
-              selector={(state) => [state.isSubmitting]}
+              selector={state => [state.isSubmitting]}
               children={([isSubmitting]) => (
                 <Button
                   label="Save Changes"

@@ -1,8 +1,7 @@
 import { useForm } from '@tanstack/react-form';
-import * as React from 'react';
-import { ScrollView, Pressable } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
+import * as React from 'react';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView } from 'react-native';
 import * as z from 'zod';
 import { Button, Input, Text, View } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
@@ -65,7 +64,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
   });
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={10}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={10}>
       <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-900">
         <View className="flex-1 p-4 pt-12">
           {/* Header */}
@@ -81,7 +80,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
           {/* Full Name */}
           <form.Field
             name="full_name"
-            children={(field) => (
+            children={field => (
               <View className="mb-4">
                 <Input
                   testID="full-name-input"
@@ -99,7 +98,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
           {/* Email */}
           <form.Field
             name="email"
-            children={(field) => (
+            children={field => (
               <View className="mb-4">
                 <Input
                   testID="email-input"
@@ -119,7 +118,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
           {/* Password */}
           <form.Field
             name="password"
-            children={(field) => (
+            children={field => (
               <View className="mb-4">
                 <Input
                   testID="password-input"
@@ -144,7 +143,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
           <View className="mb-4 flex-row gap-2">
             <form.Field
               name="current_city"
-              children={(field) => (
+              children={field => (
                 <View className="flex-1">
                   <Input
                     testID="city-input"
@@ -161,7 +160,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
 
             <form.Field
               name="current_country"
-              children={(field) => (
+              children={field => (
                 <View className="flex-1">
                   <Input
                     testID="country-input"
@@ -180,7 +179,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
           {/* Bio */}
           <form.Field
             name="bio"
-            children={(field) => (
+            children={field => (
               <View className="mb-6">
                 <Input
                   testID="bio-input"
@@ -199,7 +198,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
 
           {/* Submit Button */}
           <form.Subscribe
-            selector={(state) => [state.isSubmitting]}
+            selector={state => [state.isSubmitting]}
             children={([isSubmitting]) => (
               <Button
                 testID="register-button"
