@@ -1,0 +1,1 @@
+SELECT id, email, full_name, created_at FROM users WHERE email = 'test@citycrew.com';

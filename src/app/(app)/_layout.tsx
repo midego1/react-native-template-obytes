@@ -5,8 +5,8 @@ import { useCallback, useEffect } from 'react';
 import { Pressable, Text } from '@/components/ui';
 import {
   Feed as FeedIcon,
+  Profile as ProfileIcon,
   Settings as SettingsIcon,
-  Style as StyleIcon,
 } from '@/components/ui/icons';
 import { useAuthStore as useAuth } from '@/features/auth/use-auth-store';
 import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
@@ -44,12 +44,12 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="style"
+        name="profile"
         options={{
-          title: 'Style',
+          title: 'Profile',
           headerShown: false,
-          tabBarIcon: ({ color }) => <StyleIcon color={color} />,
-          tabBarButtonTestID: 'style-tab',
+          tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
+          tabBarButtonTestID: 'profile-tab',
         }}
       />
       <Tabs.Screen
