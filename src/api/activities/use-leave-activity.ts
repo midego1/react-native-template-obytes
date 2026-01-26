@@ -36,6 +36,8 @@ export function useLeaveActivity() {
       // Invalidate queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
       queryClient.invalidateQueries({ queryKey: ['activities'] });
+      queryClient.invalidateQueries({ queryKey: ['attendee-status', activityId] });
+      queryClient.invalidateQueries({ queryKey: ['activity-conversation', activityId] });
     },
   });
 }

@@ -1,6 +1,6 @@
+import type { User } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import type { User } from '@/types/activity';
 
 /**
  * Fetch current user's profile

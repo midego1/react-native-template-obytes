@@ -1,11 +1,12 @@
-import { useLocalSearchParams, Stack, router } from 'expo-router';
-import { ScrollView, View, Pressable, Alert } from 'react-native';
 import { format } from 'date-fns';
-import { Text } from '@/components/ui';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { useActivity } from '@/api/activities/use-activity';
+import { useAttendeeStatus } from '@/api/activities/use-attendee-status';
 import { useJoinActivity } from '@/api/activities/use-join-activity';
 import { useLeaveActivity } from '@/api/activities/use-leave-activity';
-import { useAttendeeStatus } from '@/api/activities/use-attendee-status';
+import { ActivityChatButton } from '@/components/activity/activity-chat-button';
+import { Text } from '@/components/ui';
 import { ACTIVITY_CATEGORIES } from '@/types/activity';
 
 // eslint-disable-next-line max-lines-per-function
@@ -43,10 +44,10 @@ export default function ActivityDetailScreen() {
     );
   }
 
-  const category = ACTIVITY_CATEGORIES.find((c) => c.value === activity.category);
+  const category = ACTIVITY_CATEGORIES.find(c => c.value === activity.category);
   const isHappeningNow = activity.is_happening_now;
-  const isFull =
-    activity.max_attendees && activity.attendee_count
+  const isFull
+    = activity.max_attendees && activity.attendee_count
       ? activity.attendee_count >= activity.max_attendees
       : false;
 
@@ -55,7 +56,8 @@ export default function ActivityDetailScreen() {
   const isPast = new Date(activity.starts_at) < new Date();
 
   const handleJoinActivity = () => {
-    if (!id) return;
+    if (!id)
+      return;
 
     joinActivity(id, {
       onSuccess: () => {
@@ -68,7 +70,8 @@ export default function ActivityDetailScreen() {
   };
 
   const handleLeaveActivity = () => {
-    if (!id) return;
+    if (!id)
+      return;
 
     Alert.alert(
       'Leave Activity',
@@ -89,14 +92,14 @@ export default function ActivityDetailScreen() {
             });
           },
         },
-      ]
+      ],
     );
   };
 
   const getButtonConfig = () => {
     if (isHost) {
       return {
-        label: "You're hosting this",
+        label: 'You\'re hosting this',
         disabled: true,
         onPress: () => {},
         className: 'bg-gray-300 dark:bg-gray-600',
@@ -170,7 +173,9 @@ export default function ActivityDetailScreen() {
           {category && (
             <View className="mb-4 self-start rounded-full bg-indigo-100 px-4 py-2 dark:bg-indigo-900">
               <Text className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
-                {category.emoji} {category.label}
+                {category.emoji}
+                {' '}
+                {category.label}
               </Text>
             </View>
           )}
@@ -196,8 +201,8 @@ export default function ActivityDetailScreen() {
               </Text>
               <Text className="text-gray-600 dark:text-gray-300">
                 {format(new Date(activity.starts_at), 'h:mm a')}
-                {activity.ends_at &&
-                  ` - ${format(new Date(activity.ends_at), 'h:mm a')}`}
+                {activity.ends_at
+                  && ` - ${format(new Date(activity.ends_at), 'h:mm a')}`}
               </Text>
               {activity.is_flexible_time && (
                 <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -218,7 +223,9 @@ export default function ActivityDetailScreen() {
                 <Text className="text-gray-600 dark:text-gray-300">{activity.location_address}</Text>
               )}
               <Text className="text-gray-600 dark:text-gray-300">
-                {activity.city}, {activity.country}
+                {activity.city}
+                ,
+                {activity.country}
               </Text>
             </View>
           </View>
@@ -228,12 +235,19 @@ export default function ActivityDetailScreen() {
             <Text className="w-24 text-gray-500 dark:text-gray-400">Who:</Text>
             <View className="flex-1">
               <Text className="font-semibold text-gray-900 dark:text-gray-100">
-                {activity.attendee_count || 0}{' '}
-                {activity.attendee_count === 1 ? 'person' : 'people'} going
+                {activity.attendee_count || 0}
+                {' '}
+                {activity.attendee_count === 1 ? 'person' : 'people'}
+                {' '}
+                going
               </Text>
               {activity.max_attendees && (
                 <Text className="text-gray-600 dark:text-gray-300">
-                  Max {activity.max_attendees} attendees
+                  Max
+                  {' '}
+                  {activity.max_attendees}
+                  {' '}
+                  attendees
                   {isFull && ' • Full'}
                 </Text>
               )}
@@ -243,7 +257,10 @@ export default function ActivityDetailScreen() {
 
         {/* Host Section */}
         {activity.host && (
-          <View className="mt-4 bg-white p-6 shadow-sm dark:bg-gray-800 dark:shadow-gray-700">
+          <Pressable
+            onPress={() => router.push(`/user/${activity.host_id}`)}
+            className="mt-4 bg-white p-6 shadow-sm active:opacity-80 dark:bg-gray-800 dark:shadow-gray-700"
+          >
             <Text className="mb-4 text-lg font-bold text-gray-900 dark:text-gray-100">
               Hosted by
             </Text>
@@ -261,9 +278,11 @@ export default function ActivityDetailScreen() {
                 </Text>
                 {activity.host.current_city && (
                   <Text className="text-sm text-gray-500 dark:text-gray-400">
-                    From {activity.host.current_city}
-                    {activity.host.current_country &&
-                      `, ${activity.host.current_country}`}
+                    From
+                    {' '}
+                    {activity.host.current_city}
+                    {activity.host.current_country
+                      && `, ${activity.host.current_country}`}
                   </Text>
                 )}
               </View>
@@ -272,6 +291,40 @@ export default function ActivityDetailScreen() {
             {activity.host.bio && (
               <Text className="mt-4 text-gray-600 dark:text-gray-300">{activity.host.bio}</Text>
             )}
+          </Pressable>
+        )}
+
+        {/* Attendees Section */}
+        {activity.attendees && activity.attendees.filter((a: any) => a.status === 'joined').length > 0 && (
+          <View className="mt-4 bg-white p-6 shadow-sm dark:bg-gray-800 dark:shadow-gray-700">
+            <Text className="mb-4 text-lg font-bold text-gray-900 dark:text-gray-100">
+              Who's Going ({activity.attendees.filter((a: any) => a.status === 'joined').length})
+            </Text>
+
+            {activity.attendees
+              .filter((a: any) => a.status === 'joined')
+              .map((attendee: any) => (
+                <Pressable
+                  key={attendee.id}
+                  onPress={() => router.push(`/user/${attendee.user_id}`)}
+                  className="mb-3 flex-row items-center active:opacity-80"
+                >
+                  <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+                    <Text className="text-lg font-bold text-gray-600 dark:text-gray-300">
+                      {attendee.user?.full_name?.charAt(0).toUpperCase() || '?'}
+                    </Text>
+                  </View>
+
+                  <View className="ml-4 flex-1">
+                    <Text className="font-semibold text-gray-900 dark:text-gray-100">
+                      {attendee.user?.full_name || 'Unknown User'}
+                    </Text>
+                    <Text className="text-sm text-gray-500 dark:text-gray-400">
+                      Joined {format(new Date(attendee.joined_at), 'MMM d, yyyy')}
+                    </Text>
+                  </View>
+                </Pressable>
+              ))}
           </View>
         )}
 
@@ -281,6 +334,14 @@ export default function ActivityDetailScreen() {
 
       {/* Fixed Bottom Button */}
       <View className="border-t border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-700">
+        {/* Show chat button for attendees and host */}
+        {(isAttending || isHost) && (
+          <View className="mb-3">
+            <ActivityChatButton activityId={id || ''} />
+          </View>
+        )}
+
+        {/* Main action button */}
         <Pressable
           disabled={buttonConfig.disabled}
           onPress={buttonConfig.onPress}

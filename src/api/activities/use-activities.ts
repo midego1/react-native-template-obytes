@@ -1,13 +1,13 @@
+import type { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import type { Activity } from '@/types/activity';
 
-interface UseActivitiesOptions {
+type UseActivitiesOptions = {
   city?: string;
   category?: string;
   status?: 'active' | 'cancelled' | 'completed';
   limit?: number;
-}
+};
 
 /**
  * Fetch activities from Supabase
@@ -33,11 +33,11 @@ export function useActivities(options: UseActivitiesOptions = {}) {
             current_city,
             current_country
           ),
-          attendees:activity_attendees (
-            count
+          attendees:activity_attendees!activity_id (
+            status
           )
         `,
-          { count: 'exact' }
+          { count: 'exact' },
         )
         .eq('status', status)
         .eq('is_public', true)
@@ -61,9 +61,10 @@ export function useActivities(options: UseActivitiesOptions = {}) {
       }
 
       // Transform the data to match our Activity type
-      const activities: Activity[] = (data || []).map((activity) => ({
+      const activities: Activity[] = (data || []).map(activity => ({
         ...activity,
-        attendee_count: activity.attendees?.[0]?.count || 0,
+        // Count only 'joined' attendees + host (1)
+        attendee_count: (activity.attendees?.filter((a: any) => a.status === 'joined').length || 0) + 1,
         is_happening_now: isHappeningNow(activity.starts_at),
       }));
 

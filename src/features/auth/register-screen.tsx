@@ -1,10 +1,10 @@
+import type { RegisterFormProps } from './components/register-form';
 import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { Alert } from 'react-native';
 import { FocusAwareStatusBar } from '@/components/ui';
-import { RegisterForm } from './components/register-form';
-import type { RegisterFormProps } from './components/register-form';
 import { registerWithEmail } from '@/lib/auth/supabase-auth';
+import { RegisterForm } from './components/register-form';
 
 export function RegisterScreen() {
   const router = useRouter();
@@ -32,9 +32,10 @@ export function RegisterScreen() {
             text: 'OK',
             onPress: () => router.replace('/'),
           },
-        ]
+        ],
       );
-    } catch (error: any) {
+    }
+    catch (error: any) {
       // Handle registration errors
       const errorMessage = error?.message || 'Failed to create account. Please try again.';
       Alert.alert('Registration Error', errorMessage);

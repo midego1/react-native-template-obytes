@@ -5,13 +5,13 @@
  * Tests authentication with test credentials
  */
 
-const https = require('https');
+const https = require('node:https');
 
 const SUPABASE_KEY = 'sb_publishable_vc8XGH1s_-Ox8MxeqhGuLw_21nng2WT';
 
 const testCredentials = {
   email: 'test@citycrew.com',
-  password: 'test123456'
+  password: 'test123456',
 };
 
 function testLogin() {
@@ -25,8 +25,8 @@ function testLogin() {
       headers: {
         'apikey': SUPABASE_KEY,
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      }
+        'Content-Length': Buffer.byteLength(postData),
+      },
     };
 
     const req = https.request(options, (res) => {
@@ -36,7 +36,8 @@ function testLogin() {
         try {
           const response = JSON.parse(data);
           resolve({ statusCode: res.statusCode, data: response });
-        } catch (e) {
+        }
+        catch (e) {
           resolve({ statusCode: res.statusCode, data, error: 'Failed to parse response' });
         }
       });
@@ -71,7 +72,8 @@ async function main() {
       console.log(`  Expires In: ${result.data.expires_in} seconds`);
       console.log('\n🎉 Authentication is working correctly!\n');
       console.log('✅ You can now test login in the app at http://localhost:8081\n');
-    } else {
+    }
+    else {
       console.log('❌ LOGIN FAILED\n');
       console.log(`Status Code: ${result.statusCode}`);
       console.log('Response:', JSON.stringify(result.data, null, 2));
@@ -83,7 +85,8 @@ async function main() {
         console.log('   - Email not confirmed\n');
       }
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.log('❌ ERROR:', error.message);
   }
 }

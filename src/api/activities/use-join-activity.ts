@@ -22,12 +22,12 @@ export function useJoinActivity() {
       // Check if already attending
       const { data: existingAttendee } = await supabase
         .from('activity_attendees')
-        .select('id')
+        .select('id, status')
         .eq('activity_id', activityId)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (existingAttendee) {
+      if (existingAttendee && existingAttendee.status === 'joined') {
         throw new Error('You are already attending this activity');
       }
 
@@ -51,7 +51,7 @@ export function useJoinActivity() {
           .from('activity_attendees')
           .select('*', { count: 'exact', head: true })
           .eq('activity_id', activityId)
-          .eq('status', 'attending');
+          .eq('status', 'joined');
 
         if (count !== null && count >= activity.max_attendees) {
           throw new Error('This activity is full');
@@ -64,7 +64,7 @@ export function useJoinActivity() {
         .insert({
           activity_id: activityId,
           user_id: user.id,
-          status: 'attending',
+          status: 'joined',
         })
         .select()
         .single();
@@ -79,6 +79,9 @@ export function useJoinActivity() {
       // Invalidate queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
       queryClient.invalidateQueries({ queryKey: ['activities'] });
+      queryClient.invalidateQueries({ queryKey: ['attendee-status', activityId] });
+      // Invalidate activity conversation to show chat button
+      queryClient.invalidateQueries({ queryKey: ['activity-conversation', activityId] });
     },
   });
 }

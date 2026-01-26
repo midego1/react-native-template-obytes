@@ -1,17 +1,29 @@
-import { Pressable, View } from 'react-native';
-import { router } from 'expo-router';
-import { formatDistanceToNow } from 'date-fns';
-import { Text } from '@/components/ui';
 import type { Activity } from '@/types/activity';
+import { format, formatDistanceToNow, isToday, isTomorrow } from 'date-fns';
+import { router } from 'expo-router';
+import { Pressable, View } from 'react-native';
+import { Text } from '@/components/ui';
 import { ACTIVITY_CATEGORIES } from '@/types/activity';
 
-interface ActivityCardProps {
+type ActivityCardProps = {
   activity: Activity;
-}
+};
 
 export function ActivityCard({ activity }: ActivityCardProps) {
-  const category = ACTIVITY_CATEGORIES.find((c) => c.value === activity.category);
+  const category = ACTIVITY_CATEGORIES.find(c => c.value === activity.category);
   const isHappeningNow = activity.is_happening_now;
+  const startDate = new Date(activity.starts_at);
+
+  // Format the start time
+  const formatStartTime = () => {
+    if (isToday(startDate)) {
+      return `Today ${format(startDate, 'h:mm a')}`;
+    }
+    if (isTomorrow(startDate)) {
+      return `Tomorrow ${format(startDate, 'h:mm a')}`;
+    }
+    return format(startDate, 'MMM d, h:mm a');
+  };
 
   const handlePress = () => {
     router.push(`/activity/${activity.id}`);
@@ -20,74 +32,69 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <Pressable
       onPress={handlePress}
-      className="mb-4 rounded-2xl bg-white p-4 shadow-sm active:opacity-80 dark:bg-gray-800 dark:shadow-gray-700"
+      className="mb-3 rounded-xl bg-white px-4 py-3 shadow-sm active:opacity-80 dark:bg-gray-800 dark:shadow-gray-700"
     >
-      {/* Header */}
-      <View className="mb-3 flex-row items-center justify-between">
-        <View className="flex-1">
-          <Text className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            {activity.host?.full_name || 'Unknown Host'}
-          </Text>
-          <Text className="text-xs text-gray-500 dark:text-gray-400">
-            {formatDistanceToNow(new Date(activity.starts_at), { addSuffix: true })}
-          </Text>
-        </View>
-
-        {isHappeningNow && (
-          <View className="rounded-full bg-red-100 px-3 py-1 dark:bg-red-900">
-            <Text className="text-xs font-semibold text-red-600 dark:text-red-300">
-              🔥 Happening Now
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {/* Content */}
-      <View className="mb-3">
-        <Text className="mb-1 text-lg font-bold text-gray-900 dark:text-gray-100">
+      {/* Line 1: Category emoji + Title + Badge */}
+      <View className="mb-1 flex-row items-center justify-between">
+        <Text className="flex-1 text-base font-bold text-gray-900 dark:text-gray-100" numberOfLines={1}>
+          {category?.emoji}
+          {' '}
           {activity.title}
         </Text>
 
-        {activity.description && (
-          <Text className="text-sm text-gray-600 dark:text-gray-300" numberOfLines={2}>
-            {activity.description}
-          </Text>
-        )}
-      </View>
-
-      {/* Category & Location */}
-      <View className="mb-3 flex-row items-center gap-2">
-        {category && (
-          <View className="rounded-full bg-indigo-100 px-3 py-1 dark:bg-indigo-900">
-            <Text className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-              {category.emoji} {category.label}
+        {isHappeningNow && (
+          <View className="ml-2 rounded-full bg-red-100 px-2 py-0.5 dark:bg-red-900">
+            <Text className="text-xs font-semibold text-red-600 dark:text-red-300">
+              🔥 Now
             </Text>
           </View>
         )}
+      </View>
 
+      {/* Line 2: Host · Start time · Relative time */}
+      <View className="mb-1 flex-row items-center">
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+            if (activity.host_id) {
+              router.push(`/user/${activity.host_id}`);
+            }
+          }}
+        >
+          <Text className="text-xs text-gray-600 dark:text-gray-400">
+            {activity.host?.full_name || 'Unknown Host'}
+          </Text>
+        </Pressable>
+        <Text className="text-xs text-gray-400 dark:text-gray-500"> · </Text>
+        <Text className="text-xs text-gray-600 dark:text-gray-400">
+          {formatStartTime()}
+        </Text>
+        {!isHappeningNow && (
+          <>
+            <Text className="text-xs text-gray-400 dark:text-gray-500"> · </Text>
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              {formatDistanceToNow(startDate, { addSuffix: true })}
+            </Text>
+          </>
+        )}
+      </View>
+
+      {/* Line 3: Description */}
+      {activity.description && (
+        <Text className="mb-1 text-sm text-gray-600 dark:text-gray-400" numberOfLines={1}>
+          {activity.description}
+        </Text>
+      )}
+
+      {/* Line 4: Location · Attendee count */}
+      <View className="flex-row items-center">
         <Text className="text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
           📍 {activity.location_name}
         </Text>
-      </View>
-
-      {/* Footer */}
-      <View className="flex-row items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
-        <View className="flex-row items-center">
-          <Text className="text-sm text-gray-600 dark:text-gray-300">
-            {activity.attendee_count || 0}{' '}
-            {activity.attendee_count === 1 ? 'person' : 'people'} going
-          </Text>
-          {activity.max_attendees && (
-            <Text className="text-sm text-gray-400 dark:text-gray-500">
-              {' '}
-              · {activity.max_attendees} max
-            </Text>
-          )}
-        </View>
-
-        <View className="rounded-full bg-indigo-500 px-4 py-2 dark:bg-indigo-600">
-          <Text className="text-sm font-semibold text-white">View</Text>
-        </View>
+        <Text className="text-xs text-gray-400 dark:text-gray-500"> · </Text>
+        <Text className="text-xs text-gray-600 dark:text-gray-400">
+          {activity.attendee_count || 0}/{activity.max_attendees || '∞'} going
+        </Text>
       </View>
     </Pressable>
   );

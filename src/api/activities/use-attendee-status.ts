@@ -34,7 +34,7 @@ export function useAttendeeStatus(activityId: string) {
         .single();
 
       return {
-        isAttending: attendee?.status === 'attending',
+        isAttending: attendee?.status === 'joined',
         isHost: activity?.host_id === user.id,
       };
     },

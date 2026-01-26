@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
-import { ScrollView, View, Pressable, Alert } from 'react-native';
-import { Text, Button } from '@/components/ui';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { useUserProfile } from '@/api/users/use-user-profile';
+import { Button, Text } from '@/components/ui';
 import { logout } from '@/lib/auth/supabase-auth';
 
 // eslint-disable-next-line max-lines-per-function
@@ -18,7 +18,8 @@ export function ProfileScreen() {
           try {
             await logout();
             router.replace('/login');
-          } catch (error: any) {
+          }
+          catch (error: any) {
             Alert.alert('Error', error.message || 'Failed to sign out');
           }
         },
@@ -69,7 +70,9 @@ export function ProfileScreen() {
           {profile.current_city && (
             <View className="mb-4 flex-row items-center">
               <Text className="text-gray-600 dark:text-gray-300">
-                📍 {profile.current_city}
+                📍
+                {' '}
+                {profile.current_city}
                 {profile.current_country && `, ${profile.current_country}`}
               </Text>
             </View>

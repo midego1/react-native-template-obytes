@@ -1,6 +1,6 @@
+import type { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import type { Activity } from '@/types/activity';
 
 /**
  * Fetch a single activity by ID
@@ -37,7 +37,7 @@ export function useActivity(activityId: string) {
               avatar_url
             )
           )
-        `
+        `,
         )
         .eq('id', activityId)
         .single();
@@ -53,7 +53,8 @@ export function useActivity(activityId: string) {
       // Transform the data
       const activity: Activity = {
         ...data,
-        attendee_count: data.attendees?.filter((a: any) => a.status === 'joined').length || 0,
+        // Include host in the count (+1)
+        attendee_count: (data.attendees?.filter((a: any) => a.status === 'joined').length || 0) + 1,
         is_happening_now: isHappeningNow(data.starts_at),
       };
 

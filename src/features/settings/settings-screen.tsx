@@ -1,6 +1,7 @@
 import Env from 'env';
 import { useUniwind } from 'uniwind';
 
+import { NotificationSettings } from '@/components/notifications/notification-settings';
 import {
   colors,
   FocusAwareStatusBar,
@@ -34,6 +35,10 @@ export function SettingsScreen() {
             <LanguageItem />
             <ThemeItem />
           </SettingsContainer>
+
+          <View className="my-4">
+            <NotificationSettings />
+          </View>
 
           <SettingsContainer title="settings.about">
             <SettingsItem

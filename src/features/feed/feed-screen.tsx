@@ -1,9 +1,9 @@
+import { router } from 'expo-router';
 import * as React from 'react';
 import { Pressable } from 'react-native';
-import { router } from 'expo-router';
-import { FocusAwareStatusBar, Text, View } from '@/components/ui';
 import { useActivities } from '@/api/activities/use-activities';
 import { ActivityList } from '@/components/activity/activity-list';
+import { FocusAwareStatusBar, Text, View } from '@/components/ui';
 
 export function FeedScreen() {
   const { data, isPending, isError, refetch, isRefetching } = useActivities({
@@ -32,7 +32,11 @@ export function FeedScreen() {
       <View className="bg-white px-4 pb-4 pt-12 shadow-sm dark:bg-gray-800 dark:shadow-gray-700">
         <Text className="text-3xl font-bold text-gray-900 dark:text-gray-100">Activities</Text>
         <Text className="mt-1 text-gray-500 dark:text-gray-400">
-          {data?.count || 0} {data?.count === 1 ? 'activity' : 'activities'} near you
+          {data?.count || 0}
+          {' '}
+          {data?.count === 1 ? 'activity' : 'activities'}
+          {' '}
+          near you
         </Text>
       </View>
 

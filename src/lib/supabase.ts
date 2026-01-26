@@ -1,7 +1,7 @@
-import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
 import Env from 'env';
 import { storage } from '@/lib/storage';
+import 'react-native-url-polyfill/auto';
 
 // MMKV storage adapter for Supabase
 const supabaseStorage = {
@@ -28,5 +28,5 @@ export const supabase = createClient(
       persistSession: true,
       detectSessionInUrl: false,
     },
-  }
+  },
 );

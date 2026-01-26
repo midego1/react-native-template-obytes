@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 
-export interface UpdateProfileData {
+export type UpdateProfileData = {
   full_name?: string;
   bio?: string;
   current_city?: string;
   current_country?: string;
   avatar_url?: string;
-}
+};
 
 /**
  * Update current user's profile

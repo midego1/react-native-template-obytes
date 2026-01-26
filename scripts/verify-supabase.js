@@ -5,7 +5,7 @@
  * Checks if database tables exist and are accessible
  */
 
-const https = require('https');
+const https = require('node:https');
 
 const SUPABASE_URL = 'https://hcwolskmqcqkkrlefaog.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_vc8XGH1s_-Ox8MxeqhGuLw_21nng2WT';
@@ -19,8 +19,8 @@ async function checkTable(tableName) {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     };
 
     const req = https.request(options, (res) => {
@@ -28,9 +28,11 @@ async function checkTable(tableName) {
       res.on('end', () => {
         if (res.statusCode === 200) {
           resolve({ table: tableName, status: '✅ EXISTS', statusCode: res.statusCode });
-        } else if (res.statusCode === 401 || res.statusCode === 403) {
+        }
+        else if (res.statusCode === 401 || res.statusCode === 403) {
           resolve({ table: tableName, status: '⚠️  PROTECTED (RLS)', statusCode: res.statusCode });
-        } else {
+        }
+        else {
           resolve({ table: tableName, status: `❌ ERROR (${res.statusCode})`, statusCode: res.statusCode });
         }
       });
@@ -56,7 +58,7 @@ async function main() {
     'crew_connections',
     'conversations',
     'conversation_participants',
-    'messages'
+    'messages',
   ];
 
   console.log('Checking tables:\n');
@@ -65,7 +67,8 @@ async function main() {
     try {
       const result = await checkTable(table);
       console.log(`${result.status.padEnd(25)} ${table}`);
-    } catch (error) {
+    }
+    catch (error) {
       console.log(`❌ FAILED                  ${table} - ${error.error}`);
     }
   }

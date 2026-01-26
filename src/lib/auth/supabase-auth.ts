@@ -1,6 +1,6 @@
-import { supabase } from '@/lib/supabase';
-import { signIn as storeSignIn, signOut as storeSignOut } from '@/features/auth/use-auth-store';
 import type { TokenType } from './utils';
+import { signIn as storeSignIn, signOut as storeSignOut } from '@/features/auth/use-auth-store';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Login with email and password using Supabase
@@ -12,7 +12,8 @@ export async function loginWithEmail(email: string, password: string) {
     password,
   });
 
-  if (error) throw error;
+  if (error)
+    throw error;
 
   if (data.session) {
     // Store Supabase session in Obytes auth store
@@ -26,7 +27,7 @@ export async function loginWithEmail(email: string, password: string) {
   return data;
 }
 
-export interface RegisterData {
+export type RegisterData = {
   email: string;
   password: string;
   fullName: string;
@@ -35,7 +36,7 @@ export interface RegisterData {
     current_country?: string;
     bio?: string;
   };
-}
+};
 
 /**
  * Register new user with email and password
@@ -54,7 +55,8 @@ export async function registerWithEmail(userData: RegisterData) {
     },
   });
 
-  if (error) throw error;
+  if (error)
+    throw error;
 
   // Update the user profile with additional data if provided
   if (data.user && profileData) {
@@ -90,7 +92,8 @@ export async function registerWithEmail(userData: RegisterData) {
  */
 export async function logout() {
   const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  if (error)
+    throw error;
 
   // Clear Obytes auth store
   storeSignOut();
@@ -101,7 +104,8 @@ export async function logout() {
  */
 export async function getSession() {
   const { data, error } = await supabase.auth.getSession();
-  if (error) throw error;
+  if (error)
+    throw error;
   return data.session;
 }
 
@@ -110,7 +114,8 @@ export async function getSession() {
  */
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
-  if (error) throw error;
+  if (error)
+    throw error;
   return data.user;
 }
 
@@ -119,7 +124,8 @@ export async function getCurrentUser() {
  */
 export async function refreshSession() {
   const { data, error } = await supabase.auth.refreshSession();
-  if (error) throw error;
+  if (error)
+    throw error;
 
   if (data.session) {
     // Update Obytes auth store with new tokens
@@ -149,11 +155,13 @@ export async function initializeAuth() {
       };
       storeSignIn(tokens);
       return session;
-    } else {
+    }
+    else {
       storeSignOut();
       return null;
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to initialize auth:', error);
     storeSignOut();
     return null;
@@ -173,10 +181,11 @@ export function setupAuthListener() {
           refresh: session.refresh_token,
         };
         storeSignIn(tokens);
-      } else {
+      }
+      else {
         storeSignOut();
       }
-    }
+    },
   );
 
   return subscription;

@@ -1,15 +1,15 @@
-import { FlatList, RefreshControl, View } from 'react-native';
-import { ActivityCard } from './activity-card';
-import { Text } from '@/components/ui';
 import type { Activity } from '@/types/activity';
+import { FlatList, RefreshControl, View } from 'react-native';
+import { Text } from '@/components/ui';
+import { ActivityCard } from './activity-card';
 
-interface ActivityListProps {
+type ActivityListProps = {
   activities: Activity[];
   isLoading?: boolean;
   isRefreshing?: boolean;
   onRefresh?: () => void;
   ListEmptyComponent?: React.ReactElement;
-}
+};
 
 export function ActivityList({
   activities,
@@ -30,15 +30,17 @@ export function ActivityList({
     <FlatList
       data={activities}
       renderItem={({ item }) => <ActivityCard activity={item} />}
-      keyExtractor={(item) => item.id}
+      keyExtractor={item => item.id}
       contentContainerStyle={{
         padding: 16,
         flexGrow: 1,
       }}
       refreshControl={
-        onRefresh ? (
-          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-        ) : undefined
+        onRefresh
+          ? (
+              <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+            )
+          : undefined
       }
       ListEmptyComponent={
         ListEmptyComponent || (

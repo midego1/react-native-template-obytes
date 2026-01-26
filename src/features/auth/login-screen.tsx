@@ -4,8 +4,8 @@ import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { Alert } from 'react-native';
 import { FocusAwareStatusBar } from '@/components/ui';
-import { LoginForm } from './components/login-form';
 import { loginWithEmail } from '@/lib/auth/supabase-auth';
+import { LoginForm } from './components/login-form';
 
 export function LoginScreen() {
   const router = useRouter();
@@ -17,7 +17,8 @@ export function LoginScreen() {
 
       // Navigate to home on success
       router.push('/');
-    } catch (error: any) {
+    }
+    catch (error: any) {
       // Handle authentication errors
       const errorMessage = error?.message || 'Failed to login. Please try again.';
       Alert.alert('Login Error', errorMessage);

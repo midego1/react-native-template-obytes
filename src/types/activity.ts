@@ -3,7 +3,7 @@
  * Based on Supabase database schema
  */
 
-export interface User {
+export type User = {
   id: string;
   email: string;
   full_name: string;
@@ -13,9 +13,9 @@ export interface User {
   current_city?: string;
   current_country?: string;
   created_at: string;
-}
+};
 
-export interface Activity {
+export type Activity = {
   id: string;
   host_id: string;
   host?: User; // Joined from users table
@@ -30,6 +30,8 @@ export interface Activity {
   location_address?: string;
   city: string;
   country: string;
+  latitude?: number;
+  longitude?: number;
 
   // Timing
   starts_at: string;
@@ -54,28 +56,28 @@ export interface Activity {
   attendee_count?: number;
   is_attending?: boolean;
   is_happening_now?: boolean;
-}
+};
 
-export interface ActivityAttendee {
+export type ActivityAttendee = {
   id: string;
   activity_id: string;
   user_id: string;
   status: 'joined' | 'pending' | 'declined';
   joined_at: string;
   user?: User;
-}
+};
 
-export type ActivityCategory =
-  | 'coffee'
-  | 'food'
-  | 'drinks'
-  | 'nightlife'
-  | 'adventure'
-  | 'sports'
-  | 'culture'
-  | 'coworking'
-  | 'sightseeing'
-  | 'other';
+export type ActivityCategory
+  = | 'coffee'
+    | 'food'
+    | 'drinks'
+    | 'nightlife'
+    | 'adventure'
+    | 'sports'
+    | 'culture'
+    | 'coworking'
+    | 'sightseeing'
+    | 'other';
 
 export const ACTIVITY_CATEGORIES: { value: ActivityCategory; label: string; emoji: string }[] = [
   { value: 'coffee', label: 'Coffee', emoji: '☕' },
