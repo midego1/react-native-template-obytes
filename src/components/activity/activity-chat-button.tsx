@@ -13,18 +13,10 @@ export function ActivityChatButton({ activityId }: ActivityChatButtonProps) {
   if (isLoading)
     return null;
 
-  // Log error for debugging
-  if (error) {
-    console.error('[ActivityChatButton] Error fetching conversation:', error);
-  }
-
-  // User is not attending - don't show chat button
-  if (!conversation) {
-    console.log('[ActivityChatButton] No conversation for activity:', activityId);
+  // User is not attending or error occurred - don't show chat button
+  if (!conversation || error) {
     return null;
   }
-
-  console.log('[ActivityChatButton] Showing chat button for conversation:', conversation.id);
 
   const handlePress = () => {
     router.push(`/chats/${conversation.id}`);

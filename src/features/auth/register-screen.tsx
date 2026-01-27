@@ -39,7 +39,9 @@ export function RegisterScreen() {
       // Handle registration errors
       const errorMessage = error?.message || 'Failed to create account. Please try again.';
       Alert.alert('Registration Error', errorMessage);
-      console.error('Registration error:', error);
+      if (__DEV__) {
+        console.error('Registration error:', error);
+      }
     }
   };
 

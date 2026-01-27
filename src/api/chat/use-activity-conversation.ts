@@ -28,8 +28,7 @@ export function useActivityConversation(activityId: string) {
 
       const isHost = activity.host_id === user.id;
 
-      console.log('[useActivityConversation] User ID:', user.id, 'Activity ID:', activityId, 'Is Host:', isHost);
-
+      
       // Check if user is attending this activity
       const { data: attendee, error: attendeeError } = await supabase
         .from('activity_attendees')
@@ -42,11 +41,9 @@ export function useActivityConversation(activityId: string) {
       if (attendeeError)
         throw new Error(`Failed to check attendance: ${attendeeError.message}`);
 
-      console.log('[useActivityConversation] Attendee record:', attendee);
 
       // User is not host and not attending - no access to group chat
       if (!isHost && !attendee) {
-        console.log('[useActivityConversation] User is not host and not attending - returning null');
         return null;
       }
 
@@ -61,11 +58,9 @@ export function useActivityConversation(activityId: string) {
       if (convError)
         throw new Error(`Failed to fetch conversation: ${convError.message}`);
 
-      console.log('[useActivityConversation] Existing conversation:', conversation);
 
       // If conversation doesn't exist, create it using the secure function
       if (!conversation) {
-        console.log('[useActivityConversation] Creating new conversation...');
 
         // Use the secure function to create the conversation
         const { data: newConvId, error: createError } = await supabase
@@ -77,7 +72,6 @@ export function useActivityConversation(activityId: string) {
         if (createError)
           throw new Error(`Failed to create conversation: ${createError.message}`);
 
-        console.log('[useActivityConversation] Created conversation:', newConvId);
 
         // Add current user as participant if not the host (do this BEFORE fetching)
         if (user.id !== activity.host_id) {
@@ -86,10 +80,8 @@ export function useActivityConversation(activityId: string) {
             user_id: user.id,
           });
 
-          if (partError) {
+          if (partError && __DEV__) {
             console.error('[useActivityConversation] Error adding participant:', partError);
-          } else {
-            console.log('[useActivityConversation] Added user as participant');
           }
         }
 
@@ -101,7 +93,9 @@ export function useActivityConversation(activityId: string) {
           .single();
 
         if (fetchError || !newConversation) {
-          console.error('[useActivityConversation] Failed to fetch conversation:', fetchError);
+          if (__DEV__) {
+            console.error('[useActivityConversation] Failed to fetch conversation:', fetchError);
+          }
           throw new Error('Failed to fetch created conversation');
         }
 
@@ -118,19 +112,14 @@ export function useActivityConversation(activityId: string) {
 
       // Add user as participant if not already
       if (!participant) {
-        console.log('[useActivityConversation] Adding user as participant...');
         const { error: partError } = await supabase.from('conversation_participants').insert({
           conversation_id: conversation.id,
           user_id: user.id,
         });
 
-        if (partError) {
+        if (partError && __DEV__) {
           console.error('[useActivityConversation] Error adding participant:', partError);
-        } else {
-          console.log('[useActivityConversation] Added user as participant');
         }
-      } else {
-        console.log('[useActivityConversation] User is already a participant');
       }
 
       return conversation;

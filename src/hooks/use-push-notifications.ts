@@ -33,7 +33,7 @@ export function usePushNotifications() {
 
     const receivedSubscription = addNotificationReceivedListener((notification) => {
       // Handle notification received while app is foregrounded
-      console.log('Notification received:', notification);
+      // Notification is displayed by the system
     });
 
     return () => {

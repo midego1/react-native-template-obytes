@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView } from 'react-native';
 import * as z from 'zod';
-import { Button, Input, Text, View } from '@/components/ui';
+import { Button, Checkbox, Input, Text, View } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 
 const schema = z.object({
@@ -34,6 +34,11 @@ const schema = z.object({
     })
     .min(1, 'Country is required'),
   bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
+  age_confirmed: z
+    .boolean()
+    .refine(val => val === true, {
+      message: 'You must confirm that you are 17 years or older',
+    }),
 });
 
 export type FormType = z.infer<typeof schema>;
@@ -54,6 +59,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
       current_city: '',
       current_country: '',
       bio: '',
+      age_confirmed: false,
     },
     validators: {
       onChange: schema as any,
@@ -192,6 +198,26 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
                   onChangeText={field.handleChange}
                   error={getFieldError(field)}
                 />
+              </View>
+            )}
+          />
+
+          {/* Age Confirmation */}
+          <form.Field
+            name="age_confirmed"
+            children={field => (
+              <View className="mb-6">
+                <Checkbox
+                  testID="age-confirmation-checkbox"
+                  label="I confirm that I am 17 years of age or older"
+                  checked={field.state.value}
+                  onChange={field.handleChange}
+                />
+                {field.state.meta.errors && field.state.meta.errors.length > 0 && (
+                  <Text className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {field.state.meta.errors[0]}
+                  </Text>
+                )}
               </View>
             )}
           />

@@ -22,7 +22,9 @@ export function LoginScreen() {
       // Handle authentication errors
       const errorMessage = error?.message || 'Failed to login. Please try again.';
       Alert.alert('Login Error', errorMessage);
-      console.error('Login error:', error);
+      if (__DEV__) {
+        console.error('Login error:', error);
+      }
     }
   };
 

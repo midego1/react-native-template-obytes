@@ -1,5 +1,6 @@
 import Env from 'env';
 import { useUniwind } from 'uniwind';
+import { Linking, Alert } from 'react-native';
 
 import { NotificationSettings } from '@/components/notifications/notification-settings';
 import {
@@ -70,8 +71,38 @@ export function SettingsScreen() {
           </SettingsContainer>
 
           <SettingsContainer title="settings.links">
-            <SettingsItem text="settings.privacy" onPress={() => {}} />
-            <SettingsItem text="settings.terms" onPress={() => {}} />
+            <SettingsItem
+              text="settings.privacy"
+              onPress={async () => {
+                // TODO: Replace with your actual hosted privacy policy URL
+                // IMPORTANT: Must be hosted and accessible before App Store submission
+                const url = 'https://citycrew.app/privacy';
+                try {
+                  await Linking.openURL(url);
+                } catch (error) {
+                  Alert.alert(
+                    'Privacy Policy',
+                    'Privacy policy will be available soon. Please check back later or contact support.',
+                  );
+                }
+              }}
+            />
+            <SettingsItem
+              text="settings.terms"
+              onPress={async () => {
+                // TODO: Replace with your actual hosted terms of service URL
+                // IMPORTANT: Must be hosted and accessible before App Store submission
+                const url = 'https://citycrew.app/terms';
+                try {
+                  await Linking.openURL(url);
+                } catch (error) {
+                  Alert.alert(
+                    'Terms of Service',
+                    'Terms of service will be available soon. Please check back later or contact support.',
+                  );
+                }
+              }}
+            />
             <SettingsItem
               text="settings.github"
               icon={<Github color={iconColor} />}

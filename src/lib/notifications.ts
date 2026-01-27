@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 // Only import on native platforms (web doesn't support these)
 const Device = Platform.OS !== 'web' ? require('expo-device') : null;
@@ -24,13 +25,17 @@ if (Platform.OS !== 'web' && Notifications) {
 export async function requestNotificationPermissions(): Promise<string | null> {
   // Web doesn't support push notifications
   if (Platform.OS === 'web' || !Device || !Notifications) {
-    console.warn('Push notifications not supported on web');
+    if (__DEV__) {
+      console.warn('Push notifications not supported on web');
+    }
     return null;
   }
 
   // Notifications don't work on simulators
   if (!Device.isDevice) {
-    console.warn('Push notifications only work on physical devices');
+    if (__DEV__) {
+      console.warn('Push notifications only work on physical devices');
+    }
     return null;
   }
 
@@ -45,19 +50,23 @@ export async function requestNotificationPermissions(): Promise<string | null> {
   }
 
   if (finalStatus !== 'granted') {
-    console.warn('Notification permissions not granted');
+    if (__DEV__) {
+      console.warn('Notification permissions not granted');
+    }
     return null;
   }
 
   // Get push token
   try {
     const token = await Notifications.getExpoPushTokenAsync({
-      projectId: 'c3e1075b-6fe7-4686-aa49-35b46a229044',
+      projectId: Constants.expoConfig?.extra?.eas?.projectId,
     });
     return token.data;
   }
   catch (error) {
-    console.error('Failed to get push token:', error);
+    if (__DEV__) {
+      console.error('Failed to get push token:', error);
+    }
     return null;
   }
 }

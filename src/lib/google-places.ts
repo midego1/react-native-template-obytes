@@ -74,7 +74,9 @@ export async function placesAutocomplete(
   sessionToken?: string,
 ): Promise<PlaceSuggestion[]> {
   if (!API_KEY) {
-    console.warn('Google Places API key not configured');
+    if (__DEV__) {
+      console.warn('Google Places API key not configured');
+    }
     return [];
   }
 
@@ -98,8 +100,10 @@ export async function placesAutocomplete(
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Places Autocomplete error:', errorText);
+      if (__DEV__) {
+        const errorText = await response.text();
+        console.error('Places Autocomplete error:', errorText);
+      }
       return [];
     }
 
@@ -125,7 +129,9 @@ export async function placesAutocomplete(
       .slice(0, 5);
   }
   catch (error) {
-    console.error('Places Autocomplete fetch error:', error);
+    if (__DEV__) {
+      console.error('Places Autocomplete fetch error:', error);
+    }
     return [];
   }
 }
@@ -138,7 +144,9 @@ export async function getPlaceDetails(
   sessionToken?: string,
 ): Promise<PlaceDetails | null> {
   if (!API_KEY) {
-    console.warn('Google Places API key not configured');
+    if (__DEV__) {
+      console.warn('Google Places API key not configured');
+    }
     return null;
   }
 
@@ -155,8 +163,10 @@ export async function getPlaceDetails(
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Place Details error:', errorText);
+      if (__DEV__) {
+        const errorText = await response.text();
+        console.error('Place Details error:', errorText);
+      }
       return null;
     }
 
@@ -220,7 +230,9 @@ export async function getPlaceDetails(
     return result;
   }
   catch (error) {
-    console.error('Place Details fetch error:', error);
+    if (__DEV__) {
+      console.error('Place Details fetch error:', error);
+    }
     return null;
   }
 }
