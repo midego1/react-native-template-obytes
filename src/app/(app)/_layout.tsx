@@ -44,7 +44,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Activities',
+          title: 'Explore',
+          headerShown: false,
           tabBarIcon: ({ color }) => <FeedIcon color={color} />,
           tabBarButtonTestID: 'feed-tab',
         }}

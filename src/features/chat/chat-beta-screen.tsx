@@ -375,15 +375,6 @@ export function ChatBetaScreen({ conversationId = 'demo' }: ChatBetaScreenProps)
   const renderActions = () => {
     return (
       <Actions
-        containerStyle={{
-          width: 44,
-          height: 44,
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginLeft: 4,
-          marginRight: 4,
-          marginBottom: 0,
-        }}
         icon={() => <Ionicons name="add-circle" size={32} color="#007AFF" />}
         onPressActionButton={handleMediaAction}
       />
@@ -519,8 +510,6 @@ export function ChatBetaScreen({ conversationId = 'demo' }: ChatBetaScreenProps)
         <GiftedChat
           messages={giftedMessages}
           onSend={onSend}
-          onLongPress={onLongPress}
-          onInputTextChanged={handleInputTextChanged}
           text={editingMessage?.text}
           user={{ _id: currentUserId }}
           placeholder="Type a message..."

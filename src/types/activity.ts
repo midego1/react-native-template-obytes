@@ -56,6 +56,7 @@ export type Activity = {
   attendee_count?: number;
   is_attending?: boolean;
   is_happening_now?: boolean;
+  attendees?: ActivityAttendee[];
 };
 
 export type ActivityAttendee = {

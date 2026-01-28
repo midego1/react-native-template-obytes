@@ -1,67 +1,129 @@
+import type { ActivitiesBottomSheetRef } from '@/components/home';
+import type { MapViewRef } from '@/components/map';
+import type { Activity, ActivityCategory } from '@/types/activity';
 import { router } from 'expo-router';
 import * as React from 'react';
-import { Pressable } from 'react-native';
+import { useCallback, useMemo, useRef, useState } from 'react';
+
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useActivities } from '@/api/activities/use-activities';
-import { ActivityList } from '@/components/activity/activity-list';
-import { FocusAwareStatusBar, Text, View } from '@/components/ui';
+import {
+  ActivitiesBottomSheet,
+  CategoryChips,
+  CreateFab,
+  ErrorView,
+  HomeHeader,
+  ListToggleButton,
+  LocationButton,
+  SparkleButton,
+  TravelersCard,
+} from '@/components/home';
+import { MapViewComponent } from '@/components/map';
+import { FocusAwareStatusBar, View } from '@/components/ui';
+import { useUserLocation } from '@/hooks/use-user-location';
+
+type ViewMode = 'map' | 'list';
 
 export function FeedScreen() {
-  const { data, isPending, isError, refetch, isRefetching } = useActivities({
+  const insets = useSafeAreaInsets();
+  const mapRef = useRef<MapViewRef>(null);
+  const bottomSheetRef = useRef<ActivitiesBottomSheetRef>(null);
+
+  const [viewMode, setViewMode] = useState<ViewMode>('map');
+  const [selectedCategory, setSelectedCategory] = useState<ActivityCategory | 'all' | 'popular'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const { location, refreshLocation } = useUserLocation();
+
+  const { data, isPending, isError, refetch } = useActivities({
     status: 'active',
     limit: 50,
+    category: selectedCategory === 'all' || selectedCategory === 'popular' ? undefined : selectedCategory,
   });
 
-  if (isError) {
-    return (
-      <View className="flex-1 items-center justify-center p-8 bg-gray-50 dark:bg-gray-900">
-        <Text className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-100">
-          Oops! Something went wrong
-        </Text>
-        <Text className="text-center text-gray-500 dark:text-gray-400">
-          Failed to load activities. Please try again.
-        </Text>
-      </View>
+  const filteredActivities = useMemo(() => {
+    const activities = data?.activities || [];
+    if (!searchQuery.trim())
+      return activities;
+    const query = searchQuery.toLowerCase();
+    return activities.filter(
+      activity =>
+        activity.title.toLowerCase().includes(query)
+        || activity.description?.toLowerCase().includes(query)
+        || activity.location_name.toLowerCase().includes(query),
     );
+  }, [data?.activities, searchQuery]);
+
+  const initialRegion = useMemo(() => {
+    if (location) {
+      return { latitude: location.latitude, longitude: location.longitude, latitudeDelta: 0.1, longitudeDelta: 0.1 };
+    }
+    return { latitude: 3.139, longitude: 101.6869, latitudeDelta: 0.1, longitudeDelta: 0.1 };
+  }, [location]);
+
+  const handleMarkerPress = useCallback((activity: Activity) => {
+    router.push(`/activity/${activity.id}`);
+  }, []);
+
+  const handleLocationPress = useCallback(() => {
+    if (location) {
+      mapRef.current?.animateToRegion({ latitude: location.latitude, longitude: location.longitude, latitudeDelta: 0.05, longitudeDelta: 0.05 });
+    }
+    else {
+      refreshLocation();
+    }
+  }, [location, refreshLocation]);
+
+  const handleToggleView = useCallback(() => {
+    if (viewMode === 'map') {
+      bottomSheetRef.current?.snapToIndex(2);
+      setViewMode('list');
+    }
+    else {
+      bottomSheetRef.current?.snapToIndex(0);
+      setViewMode('map');
+    }
+  }, [viewMode]);
+
+  if (isError) {
+    return <ErrorView onRetry={refetch} />;
   }
 
   return (
-    <View className="flex-1 bg-gray-50 dark:bg-gray-900">
+    <View className="flex-1 bg-gray-50">
       <FocusAwareStatusBar />
-
-      {/* Header */}
-      <View className="bg-white px-4 pb-4 pt-12 shadow-sm dark:bg-gray-800 dark:shadow-gray-700">
-        <Text className="text-3xl font-bold text-gray-900 dark:text-gray-100">Activities</Text>
-        <Text className="mt-1 text-gray-500 dark:text-gray-400">
-          {data?.count || 0}
-          {' '}
-          {data?.count === 1 ? 'activity' : 'activities'}
-          {' '}
-          near you
-        </Text>
+      <MapViewComponent ref={mapRef} activities={filteredActivities} initialRegion={initialRegion} onMarkerPress={handleMarkerPress} showsUserLocation />
+      <HomeHeader />
+      <View className="absolute left-4" style={{ top: insets.top + 70 }}>
+        <SparkleButton />
       </View>
-
-      {/* Activity List */}
-      <ActivityList
-        activities={data?.activities || []}
+      <View className="absolute right-4" style={{ top: insets.top + 70 }}>
+        <TravelersCard count={100} />
+      </View>
+      {viewMode === 'map' && (
+        <View className="absolute inset-x-0" style={{ top: insets.top + 130 }}>
+          <CategoryChips selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} totalCount={data?.count || 0} />
+        </View>
+      )}
+      <View className="absolute right-4" style={{ bottom: 180 }}>
+        <LocationButton onPress={handleLocationPress} />
+      </View>
+      <View className="absolute left-1/2 -translate-x-1/2" style={{ bottom: 130 }}>
+        <ListToggleButton viewMode={viewMode} onPress={handleToggleView} />
+      </View>
+      <View className="absolute right-4" style={{ bottom: 120 }}>
+        <CreateFab />
+      </View>
+      <ActivitiesBottomSheet
+        ref={bottomSheetRef}
+        activities={filteredActivities}
         isLoading={isPending}
-        isRefreshing={isRefetching}
-        onRefresh={refetch}
+        totalCount={data?.count || 0}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
-
-      {/* Floating Action Button */}
-      <Pressable
-        onPress={() => router.push('/create-activity')}
-        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-indigo-500 shadow-lg active:bg-indigo-600 dark:bg-indigo-600 dark:active:bg-indigo-700"
-        style={{
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 4,
-          elevation: 8,
-        }}
-      >
-        <Text className="text-2xl text-white">+</Text>
-      </Pressable>
     </View>
   );
 }

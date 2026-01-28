@@ -200,7 +200,7 @@ describe('placeAutocomplete', () => {
       () => Promise.resolve([]),
     );
 
-    const { getByPlaceholderText, queryByText } = render(
+    const { getByPlaceholderText, getByText, queryByText } = render(
       <PlaceAutocomplete {...defaultProps} />,
     );
 

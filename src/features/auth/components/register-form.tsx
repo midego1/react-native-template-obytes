@@ -212,6 +212,7 @@ export function RegisterForm({ onSubmit = () => {} }: RegisterFormProps) {
                   label="I confirm that I am 17 years of age or older"
                   checked={field.state.value}
                   onChange={field.handleChange}
+                  accessibilityLabel="Age confirmation checkbox"
                 />
                 {field.state.meta.errors && field.state.meta.errors.length > 0 && (
                   <Text className="mt-1 text-sm text-red-600 dark:text-red-400">

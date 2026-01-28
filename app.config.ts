@@ -48,6 +48,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       NSPhotoLibraryAddUsageDescription: 'Allow CityCrew to save images to your photo library.',
       NSCameraUsageDescription: 'Allow CityCrew to use your camera to take photos for chats.',
       NSMicrophoneUsageDescription: 'Allow CityCrew to access your microphone to record audio messages.',
+      NSLocationWhenInUseUsageDescription: 'CityCrew needs your location to show activities near you and on the map.',
     },
   },
   notification: {
@@ -72,6 +73,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'READ_EXTERNAL_STORAGE',
       'WRITE_EXTERNAL_STORAGE',
       'READ_MEDIA_IMAGES',
+      'ACCESS_FINE_LOCATION',
+      'ACCESS_COARSE_LOCATION',
     ],
   },
   web: {
