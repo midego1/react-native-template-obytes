@@ -1,8 +1,8 @@
+import 'tsx/cjs';
 import type { ConfigContext, ExpoConfig } from '@expo/config';
+
 import type { AppIconBadgeConfig } from 'app-icon-badge/types';
 import Env from './env';
-
-import 'tsx/cjs';
 
 const EXPO_ACCOUNT_OWNER = 'obytes';
 const EAS_PROJECT_ID = 'c3e1075b-6fe7-4686-aa49-35b46a229044';
@@ -29,7 +29,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   description: `${Env.EXPO_PUBLIC_NAME} Mobile App`,
   owner: EXPO_ACCOUNT_OWNER,
   scheme: Env.EXPO_PUBLIC_SCHEME,
-  slug: 'obytesapp',
+  slug: 'citycrew',
   version: Env.EXPO_PUBLIC_VERSION.toString(),
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -44,7 +44,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: Env.EXPO_PUBLIC_BUNDLE_ID,
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
+      NSPhotoLibraryUsageDescription: 'Allow CityCrew to access your photos so you can share images in chats.',
+      NSPhotoLibraryAddUsageDescription: 'Allow CityCrew to save images to your photo library.',
+      NSCameraUsageDescription: 'Allow CityCrew to use your camera to take photos for chats.',
+      NSMicrophoneUsageDescription: 'Allow CityCrew to access your microphone to record audio messages.',
+      NSLocationWhenInUseUsageDescription: 'CityCrew needs your location to show activities near you and on the map.',
     },
+  },
+  notification: {
+    icon: './assets/notification-icon.png',
+    color: '#6366F1',
+    iosDisplayInForeground: true,
+    androidMode: 'default',
+    androidCollapsedTitle: '#{unread_notifications} new notifications',
   },
   experiments: {
     typedRoutes: true,
@@ -55,6 +67,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#2E3C4B',
     },
     package: Env.EXPO_PUBLIC_PACKAGE,
+    permissions: [
+      'RECEIVE_BOOT_COMPLETED',
+      'VIBRATE',
+      'READ_EXTERNAL_STORAGE',
+      'WRITE_EXTERNAL_STORAGE',
+      'READ_MEDIA_IMAGES',
+      'ACCESS_FINE_LOCATION',
+      'ACCESS_COARSE_LOCATION',
+    ],
   },
   web: {
     favicon: './assets/favicon.png',

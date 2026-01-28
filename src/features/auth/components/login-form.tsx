@@ -1,14 +1,13 @@
 import { useForm } from '@tanstack/react-form';
-
+import { useRouter } from 'expo-router';
 import * as React from 'react';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { KeyboardAvoidingView, Pressable } from 'react-native';
 import * as z from 'zod';
 
 import { Button, Input, Text, View } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 
 const schema = z.object({
-  name: z.string().optional(),
   email: z
     .string({
       message: 'Email is required',
@@ -31,13 +30,13 @@ export type LoginFormProps = {
 
 // eslint-disable-next-line max-lines-per-function
 export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
+  const router = useRouter();
+
   const form = useForm({
     defaultValues: {
-      name: '',
       email: '',
       password: '',
     },
-
     validators: {
       onChange: schema as any,
     },
@@ -56,30 +55,15 @@ export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
         <View className="items-center justify-center">
           <Text
             testID="form-title"
-            className="pb-6 text-center text-4xl font-bold"
+            className="pb-6 text-center text-4xl font-bold text-gray-900 dark:text-gray-100"
           >
-            Sign In
+            Welcome Back
           </Text>
 
-          <Text className="mb-6 max-w-xs text-center text-gray-500">
-            Welcome! 👋 This is a demo login screen! Feel free to use any email
-            and password to sign in and try it out.
+          <Text className="mb-6 max-w-xs text-center text-gray-500 dark:text-gray-400">
+            Sign in to continue exploring activities and connecting with travelers
           </Text>
         </View>
-
-        <form.Field
-          name="name"
-          children={field => (
-            <Input
-              testID="name"
-              label="Name"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChangeText={field.handleChange}
-              error={getFieldError(field)}
-            />
-          )}
-        />
 
         <form.Field
           name="email"
@@ -116,12 +100,21 @@ export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
           children={([isSubmitting]) => (
             <Button
               testID="login-button"
-              label="Login"
+              label="Sign In"
               onPress={form.handleSubmit}
               loading={isSubmitting}
+              className="mb-4"
             />
           )}
         />
+
+        {/* Register Link */}
+        <View className="flex-row items-center justify-center">
+          <Text className="text-gray-600 dark:text-gray-400">Don't have an account? </Text>
+          <Pressable onPress={() => router.push('/register')}>
+            <Text className="font-semibold text-indigo-600 dark:text-indigo-400">Create Account</Text>
+          </Pressable>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

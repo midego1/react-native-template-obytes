@@ -4,13 +4,17 @@ import { withUniwind } from 'uniwind';
 export * from './button';
 export * from './checkbox';
 export { default as colors } from './colors';
+export * from './date-time-picker';
+export * from './duration-presets';
 export * from './focus-aware-status-bar';
 export * from './image';
 export * from './input';
 export * from './list';
 export * from './modal';
+export * from './place-autocomplete';
 export * from './progress-bar';
 export * from './select';
+export * from './step-indicator';
 export * from './text';
 export * from './utils';
 

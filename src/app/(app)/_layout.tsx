@@ -1,12 +1,14 @@
-import { Link, Redirect, SplashScreen, Tabs } from 'expo-router';
+import { Redirect, SplashScreen, Tabs } from 'expo-router';
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 
-import { Pressable, Text } from '@/components/ui';
+import { useConversations } from '@/api/chat/use-conversations';
+import { useCrewRequests } from '@/api/crew/use-crew-requests';
 import {
+  Chat as ChatIcon,
+  Crew as CrewIcon,
   Feed as FeedIcon,
-  Settings as SettingsIcon,
-  Style as StyleIcon,
+  Profile as ProfileIcon,
 } from '@/components/ui/icons';
 import { useAuthStore as useAuth } from '@/features/auth/use-auth-store';
 import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
@@ -14,6 +16,12 @@ import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
 export default function TabLayout() {
   const status = useAuth.use.status();
   const [isFirstTime] = useIsFirstTime();
+  const { data: requests } = useCrewRequests();
+  const { data: conversations } = useConversations();
+  const pendingCount = requests?.received.length || 0;
+  const unreadCount
+    = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
+
   const hideSplash = useCallback(async () => {
     await SplashScreen.hideAsync();
   }, []);
@@ -36,41 +44,64 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Feed',
+          title: 'Explore',
+          headerShown: false,
           tabBarIcon: ({ color }) => <FeedIcon color={color} />,
-          headerRight: () => <CreateNewPostLink />,
           tabBarButtonTestID: 'feed-tab',
         }}
       />
 
       <Tabs.Screen
-        name="style"
+        name="chats"
         options={{
-          title: 'Style',
+          title: 'Chats',
           headerShown: false,
-          tabBarIcon: ({ color }) => <StyleIcon color={color} />,
-          tabBarButtonTestID: 'style-tab',
+          tabBarIcon: ({ color }) => <ChatIcon color={color} />,
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+          tabBarButtonTestID: 'chats-tab',
+        }}
+      />
+
+      <Tabs.Screen
+        name="crew"
+        options={{
+          title: 'Crew',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <CrewIcon color={color} />,
+          tabBarBadge: pendingCount > 0 ? pendingCount : undefined,
+          tabBarButtonTestID: 'crew-tab',
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
+          tabBarButtonTestID: 'profile-tab',
+        }}
+      />
+
+      {/* Hidden routes - not shown in tab bar */}
+      <Tabs.Screen
+        name="chat-beta"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
-          tabBarButtonTestID: 'settings-tab',
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="style"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
-  );
-}
-
-function CreateNewPostLink() {
-  return (
-    <Link href="/feed/add-post" asChild>
-      <Pressable>
-        <Text className="px-3 text-primary-300">Create</Text>
-      </Pressable>
-    </Link>
   );
 }
