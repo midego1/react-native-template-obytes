@@ -1,6 +1,5 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, passthroughImageService } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import starlightLlmsTxt from 'starlight-llms-txt';
 
 const site = 'https://starter.obytes.com/';
@@ -24,9 +23,9 @@ export default defineConfig({
       components: {
         LastUpdated: './src/components/LastUpdated.astro',
       },
-      social: {
-        github: 'https://github.com/obytes/react-native-template-obytes',
-      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/obytes/react-native-template-obytes' },
+      ],
       head: [
         {
           tag: 'meta',
@@ -232,10 +231,13 @@ export default defineConfig({
       lastUpdated: true,
     }),
   ],
-  // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
   image: {
-    service: {
-      entrypoint: 'astro/assets/services/sharp',
+    service: passthroughImageService(),
+  },
+  // Prevent Vite from externalizing zod, which conflicts with the root project's zod@4
+  vite: {
+    ssr: {
+      noExternal: ['zod'],
     },
   },
 });
